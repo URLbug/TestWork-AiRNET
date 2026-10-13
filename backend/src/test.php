@@ -110,25 +110,20 @@ function login($role) {
         'sec-ch-ua-platform: "Windows"'
     ];
 
-    // Инициализация cURL
     $ch = curl_init($url);
 
-    // Настройки cURL
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // Вернуть ответ строкой
     curl_setopt($ch, CURLOPT_POST, true);           // Метод POST (так как есть тело запроса)
     curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData); // Тело запроса (JSON)
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);  // Заголовки
     curl_setopt($ch, CURLOPT_HEADER, true);
 
-    // Выполнение запроса
     $response = curl_exec($ch);
 
-    // Отделяем заголовки от тела ответа
     $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
     $responseHeaders = substr($response, 0, $headerSize);
     $responseBody = substr($response, $headerSize);
 
-    // Ищем все заголовки Set-Cookie с помощью регулярного выражения
     preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $responseHeaders, $matches);
 
     $cookies = [];
@@ -139,7 +134,6 @@ function login($role) {
         }
     }
 
-    // Закрываем сеанс
     curl_close($ch);
 
     return ['response' => json_decode($responseBody), 'cookies' => $cookies];

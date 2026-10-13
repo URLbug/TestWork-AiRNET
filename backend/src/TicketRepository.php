@@ -59,10 +59,15 @@ class TicketRepository
 
     public function changeSource($id, $sourceId, array $employee)
     {
-        $ticket = pg_fetch_assoc(query('SELECT source_id FROM tickets WHERE id=$1', array($id)));
+        $ticket = pg_fetch_assoc(query('SELECT source_id, status FROM tickets WHERE id=$1', array($id)));
         if (!$ticket) {
             respond(404, array('error' => 'not_found', 'message' => 'Заявка не найдена'));
         }
+
+        if($ticket['status'] == 'archived') {
+            respond(403, array('error' => 'forbidden', 'message' => 'Невозможно изменить архивную заявку'));
+        }
+
         if (!pg_fetch_assoc(query('SELECT id FROM sources WHERE id=$1', array($sourceId)))) {
             respond(400, array('error' => 'invalid_source', 'message' => 'Источник не найден'));
         }

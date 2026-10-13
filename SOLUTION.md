@@ -130,6 +130,15 @@ Result:
 PASS: PHP 7.4, isolated database, session, list, sources, normal ticket
 ```
 
+```
+python -m unittest discover -s tools/
+....
+----------------------------------------------------------------------
+Ran 4 tests in 4.287s
+
+```
+
+
 ## Одновременное редактирование
 
 Что произойдёт при изменении одной заявки двумя сотрудниками?

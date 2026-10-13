@@ -130,9 +130,6 @@ Result:
 PASS: PHP 7.4, isolated database, session, list, sources, normal ticket
 ```
 
-```
-```
-
 ## Одновременное редактирование
 
 Что произойдёт при изменении одной заявки двумя сотрудниками?

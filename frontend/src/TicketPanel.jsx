@@ -15,14 +15,36 @@ export default function TicketPanel({ employee, selectedId, sources, onChanged }
       setTicket(null);
       return;
     }
+
+    // Создаем контроллер для отмены текущего запроса
+    const controller = new AbortController();
+
     setLoading(true);
     setError('');
     setMessage('');
-    api(`/tickets/${selectedId}`).then(data => {
-      setTicket(data.ticket);
-      setHistory(data.history);
-      setSourceId(String(data.ticket.source?.id ?? ''));
-    }).catch(error => setError(error.message)).finally(() => setLoading(false));
+
+    // Передаем сигнал отмены в функцию api (предполагая, что она поддерживает fetch/signal)
+    // Если ваш помощник api() принимает опции вторым аргументом, прокидываем сигнал туда:
+    api(`/tickets/${selectedId}`, { signal: controller.signal })
+      .then(data => {
+        setTicket(data.ticket);
+        setHistory(data.history);
+        setSourceId(String(data.ticket.source?.id ?? ''));
+        setLoading(false);
+      })
+      .catch(err => {
+        // Игнорируем ошибку отмены, чтобы не выводить её на экран
+        if (err.name === 'AbortError') {
+          return;
+        }
+        setError(err.message);
+        setLoading(false);
+      });
+
+    // Функция очистки: выполнится, если selectedId изменится или компонент размонтируется
+    return () => {
+      controller.abort();
+    };
   }, [selectedId]);
 
   async function save() {
@@ -31,7 +53,10 @@ export default function TicketPanel({ employee, selectedId, sources, onChanged }
     setError('');
     setMessage('');
     try {
-      const data = await api(`/tickets/${ticket.id}/source`, { method: 'POST', body: JSON.stringify({ source_id: Number(sourceId) }) });
+      const data = await api(`/tickets/${ticket.id}/source`, { 
+        method: 'POST', 
+        body: JSON.stringify({ source_id: Number(sourceId) }) 
+      });
       setTicket(data.ticket);
       setHistory(data.history);
       setMessage('Источник сохранён');

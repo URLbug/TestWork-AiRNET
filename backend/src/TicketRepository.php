@@ -16,7 +16,16 @@ class TicketRepository
         if (!$row) {
             return null;
         }
+        
         $source = pg_fetch_assoc(query('SELECT id, name FROM sources WHERE id=$1', array($row['source_id'])));
+        # Делаем доп проверку. Если источника нет, то тогда отображаем как "Не указан".
+        if(!$source) {
+            $source = array(
+                'id' => -1,
+                'name' => 'Не указан'
+            );
+        }
+
         return array(
             'id' => (int) $row['id'],
             'title' => $row['title'],

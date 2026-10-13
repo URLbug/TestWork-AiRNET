@@ -107,3 +107,22 @@ function requestBody()
     }
     return $value;
 }
+
+function dumpLog($message, $logName = 'app') {
+    $logDir = __DIR__ . '/logs';
+
+    if (!is_dir($logDir)) {
+        mkdir($logDir, 0777, true);
+    }
+
+    $filePath = $logDir . '/' . $logName . '-' . date('Y-m-d') . '.log';
+    $timestamp = date('Y-m-d H:i:s');
+    
+    if (is_array($message) || is_object($message)) {
+        $message = print_r($message, true);
+    }
+
+    $logEntry = "[" . $timestamp . "] " . $message . PHP_EOL;
+
+    file_put_contents($filePath, $logEntry, FILE_APPEND);
+}
